@@ -87,14 +87,14 @@ def get_progress(conn, condition_id: str) -> dict | None:
     return {
         "condition_id": row[0],
         "status": row[1],
-        "users_found": row[2],
-        "users_done": row[3],
+        "pages_fetched": row[2],
+        "offset_reached": row[3],
         "trades_stored": row[4],
     }
 
 
 def set_progress(conn, condition_id: str, *, status: str,
-                 users_found: int = 0, users_done: int = 0,
+                 pages_fetched: int = 0, offset_reached: int = 0,
                  trades_stored: int = 0):
     with conn.cursor() as cur:
         cur.execute(
@@ -109,6 +109,6 @@ def set_progress(conn, condition_id: str, *, status: str,
                 trades_stored = EXCLUDED.trades_stored,
                 updated_at = now()
             """,
-            (condition_id, status, users_found, users_done, trades_stored),
+            (condition_id, status, pages_fetched, offset_reached, trades_stored),
         )
     conn.commit()

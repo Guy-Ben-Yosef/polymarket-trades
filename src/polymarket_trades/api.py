@@ -1,4 +1,6 @@
 import time
+from collections.abc import Generator
+
 import requests
 
 GAMMA_API_BASE = "https://gamma-api.polymarket.com"
@@ -22,39 +24,6 @@ def fetch_event_markets(slug: str, question_filter: str | None = None) -> list[d
     return markets
 
 
-def fetch_unique_users(condition_id: str, limit: int = 500,
-                       max_pages: int = 100, page_delay: float = 0.2) -> list[str]:
-    unique_users = set()
-    offset = 0
-    page = 0
-
-    while page < max_pages:
-        params = {"market": condition_id, "limit": limit, "offset": offset}
-        try:
-            resp = requests.get(f"{DATA_API_BASE}/trades", params=params)
-            resp.raise_for_status()
-            trades = resp.json()
-        except requests.exceptions.RequestException:
-            break
-
-        if not trades:
-            break
-
-        for t in trades:
-            addr = t.get("proxyWallet")
-            if addr:
-                unique_users.add(addr)
-
-        if len(trades) < limit:
-            break
-
-        offset += limit
-        page += 1
-        time.sleep(page_delay)
-
-    return sorted(unique_users)
-
-
 def _extract_fields(record: dict) -> dict:
     return {
         "transaction_hash": record.get("transactionHash", ""),
@@ -70,39 +39,29 @@ def _extract_fields(record: dict) -> dict:
     }
 
 
-def fetch_user_trades(proxy_wallet: str, condition_id: str,
-                      limit: int = 500, max_pages: int = 50,
-                      page_delay: float = 0.05) -> list[dict]:
-    all_trades = []
-    offset = 0
+def fetch_market_trades(condition_id: str, *, limit: int = 500,
+                        max_pages: int = 200, page_delay: float = 0.2,
+                        start_offset: int = 0) -> Generator[list[dict], None, None]:
+    offset = start_offset
     page = 0
 
     while page < max_pages:
-        params = {
-            "user": proxy_wallet,
-            "market": condition_id,
-            "limit": limit,
-            "offset": offset,
-        }
+        params = {"market": condition_id, "limit": limit, "offset": offset}
         try:
-            resp = requests.get(f"{DATA_API_BASE}/activity", params=params)
+            resp = requests.get(f"{DATA_API_BASE}/trades", params=params)
             resp.raise_for_status()
-            activities = resp.json()
+            trades = resp.json()
         except requests.exceptions.RequestException:
             break
 
-        if not activities:
+        if not trades:
             break
 
-        for a in activities:
-            if a.get("type") == "TRADE":
-                all_trades.append(_extract_fields(a))
+        yield [_extract_fields(t) for t in trades]
 
-        if len(activities) < limit:
+        if len(trades) < limit:
             break
 
         offset += limit
         page += 1
         time.sleep(page_delay)
-
-    return all_trades

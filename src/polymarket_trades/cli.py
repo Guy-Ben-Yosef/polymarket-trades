@@ -6,8 +6,8 @@ from polymarket_trades.db import init_db
 from polymarket_trades.collector import collect_event, collect_market
 
 
-def _progress(condition_id, users_done, users_total):
-    print(f"\r  [{condition_id[:10]}...] users {users_done}/{users_total}", end="", flush=True)
+def _progress(condition_id, pages_fetched, trades_stored):
+    print(f"\r  [{condition_id[:10]}...] pages: {pages_fetched}, trades: {trades_stored}", end="", flush=True)
 
 
 def main():
