@@ -1,5 +1,7 @@
 # polymarket-trades
 
+![version](https://img.shields.io/badge/version-0.2.0-blue)
+
 Python library for collecting Polymarket trade data into PostgreSQL.
 
 Fetches trades via Polymarket's HTTP APIs (gamma-api and data-api) by paginating the `/trades` endpoint directly — each trade is stored exactly once.
