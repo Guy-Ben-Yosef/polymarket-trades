@@ -2,9 +2,7 @@
 
 Python library for collecting Polymarket trade data into PostgreSQL.
 
-Fetches trades via Polymarket's HTTP APIs (gamma-api and data-api) using a two-step approach:
-1. Discover unique traders from the `/trades` endpoint
-2. Fetch complete trade history per trader from the `/activity` endpoint
+Fetches trades via Polymarket's HTTP APIs (gamma-api and data-api) by paginating the `/trades` endpoint directly — each trade is stored exactly once.
 
 ## Install
 
