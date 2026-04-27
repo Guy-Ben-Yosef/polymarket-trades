@@ -68,7 +68,7 @@ def insert_trades(conn, trades: list[dict]) -> int:
         for t in trades
     ]
     with conn.cursor() as cur:
-        execute_values(cur, sql, rows)
+        execute_values(cur, sql, rows, page_size=len(rows))
         inserted = cur.rowcount
     conn.commit()
     return inserted
