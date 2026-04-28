@@ -8,7 +8,7 @@ DATA_API_BASE = "https://data-api.polymarket.com"
 
 TRADE_FIELDS = (
     "transactionHash", "conditionId", "proxyWallet", "timestamp",
-    "side", "size", "usdcSize", "price", "outcome", "outcomeIndex",
+    "side", "size", "usdcSize", "price", "outcomeIndex",
 )
 
 
@@ -34,7 +34,6 @@ def _extract_fields(record: dict) -> dict:
         "size": float(record.get("size", 0) or 0),
         "usdc_size": float(record.get("usdcSize", 0) or 0),
         "price": float(record.get("price", 0) or 0),
-        "outcome": record.get("outcome", ""),
         "outcome_index": int(record.get("outcomeIndex", 0) or 0),
     }
 

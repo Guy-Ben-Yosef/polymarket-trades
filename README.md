@@ -1,6 +1,6 @@
 # polymarket-trades
 
-![version](https://img.shields.io/badge/version-0.2.0-blue)
+![version](https://img.shields.io/badge/version-0.3.0-blue)
 
 Python library for collecting Polymarket trade data into PostgreSQL.
 
@@ -45,21 +45,22 @@ polymarket-trades --dsn "postgresql://localhost/mydb" --condition-id "0x06801c..
 
 ## Database Schema
 
-Two tables are created automatically on first run:
+Four tables are created automatically on first run:
+
+**`condition_ids`** / **`proxy_wallets`** — lookup tables that normalize repeated text values into compact integer keys.
 
 **`trades`** — one row per trade:
 
 | Column | Type | Description |
 |---|---|---|
-| transaction_hash | TEXT | Blockchain transaction hash |
-| condition_id | TEXT | Market condition ID |
-| proxy_wallet | TEXT | Trader's proxy wallet address |
+| transaction_hash | BYTEA | Blockchain transaction hash (32 bytes) |
+| condition_id | SMALLINT | FK → condition_ids |
+| proxy_wallet | INTEGER | FK → proxy_wallets |
 | timestamp | TIMESTAMPTZ | Trade time |
-| side | TEXT | BUY or SELL |
+| side | BOOLEAN | true = BUY, false = SELL |
 | size | NUMERIC | Number of shares |
 | usdc_size | NUMERIC | USDC value |
 | price | NUMERIC | Price per share |
-| outcome | TEXT | e.g. "Yes", "No" |
 | outcome_index | SMALLINT | Outcome index (0, 1, ...) |
 
 Deduplicated on `(transaction_hash, condition_id, proxy_wallet, outcome_index)`.
